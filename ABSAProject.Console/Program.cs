@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ABSAProject.Console
+﻿namespace ABSAProject.Console
 {
     class Program
     {
@@ -18,52 +11,13 @@ namespace ABSAProject.Console
                 return;
             }
 
-            string[] instructions = args[0].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-            List<string> steps = new List<string>();
-            instructions.ToList().ForEach(item => steps.AddRange(Enumerable.Repeat<String>(item.Substring(0, 1), Convert.ToInt32(item.Substring(1, 1))).ToList<String>()));
-            Dictionary<string, string> ht = new Dictionary<string, string>();
+            RobotGrid robotGrid = new RobotGrid(args[0]);
+            int rightCount;
+            
+            System.Console.WriteLine($"Number Of Steps: {robotGrid.CalculateRobotUniqueMoves(out rightCount)}");
+            System.Console.WriteLine($"Number Of Right Turns: {rightCount}");
 
-            int x_point = 0;
-            int y_point = 0;
-            int stepCount = 0;
-
-            foreach (string step in steps)
-            {
-                if (stepCount == 0 && x_point == 0 && y_point == 0)
-                {
-                    ht.Add($"x{x_point}_y{y_point}", step);
-                    stepCount = stepCount + 1;
-                    continue;
-                }
-
-                if (step == "N")
-                {
-                    y_point = y_point + 1;
-                }
-
-                if (step == "S")
-                {
-                    y_point = y_point - 1;
-                }
-
-                if (step == "E")
-                {
-                    x_point = x_point + 1;
-                }
-
-                if (step == "W")
-                {
-                    x_point = x_point - 1;
-                }
-
-                if (!ht.ContainsKey($"x{x_point}_y{y_point}"))
-                {
-                    ht.Add($"x{x_point}_y{y_point}", step);
-                    stepCount = stepCount + 1;
-                }
-            }
-
-            System.Console.WriteLine($"Number Of Steps: {stepCount}");
+            System.Console.ReadLine();
         }
     }
 }
