@@ -12,10 +12,10 @@
             }
 
             RobotGrid robotGrid = new RobotGrid(args[0]);
-            int rightCount;
+            RobotGridState robotGridState =  robotGrid.MoveRobot();
             
-            System.Console.WriteLine($"Number Of Steps: {robotGrid.CalculateRobotUniqueMoves(out rightCount)}");
-            System.Console.WriteLine($"Number Of Right Turns: {rightCount}");
+            System.Console.WriteLine($"Number Of Steps: {robotGridState.StepCount}");
+            System.Console.WriteLine($"Number Of Right Turns: {robotGridState.RightTurnCount}");
 
             System.Console.ReadLine();
         }

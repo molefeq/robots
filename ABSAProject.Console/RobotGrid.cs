@@ -15,67 +15,32 @@ namespace ABSAProject.Console
         }
 
         public string RobotMoves { get; }
-        
-        public int CalculateRobotUniqueMoves(out int rightCount)
-        {
-            int stepCount = 0;
-            List<string> steps = GetRobotSteps();
 
-            rightCount = 0;
+        public RobotGridState MoveRobot()
+        {
+            RobotGridState robotGridState = new RobotGridState();
+            List<string> steps = GetRobotSteps();
 
             if (steps.Count == 0)
             {
-                return stepCount;
+                return robotGridState;
             }
-
-            int xPoint = X_ORIGIN;
-            int yPoint = Y_ORIGIN;
-            string previuosStep = null;
-
-            Dictionary<string, string> uniqueStepsTaken = new Dictionary<string, string>();
 
             foreach (string step in steps)
             {
-                if (stepCount == 0 && xPoint == X_ORIGIN && yPoint == Y_ORIGIN)
+                if (IsStartingPoint(robotGridState))
                 {
-                    uniqueStepsTaken.Add($"x{xPoint}_y{yPoint}", step);
-                    stepCount = stepCount + 1;
-                    previuosStep = step;
+                    Move(robotGridState, step);
                     continue;
                 }
 
-                if (step == "N")
-                {
-                    yPoint = yPoint + 1;
-                }
-
-                if (step == "S")
-                {
-                    yPoint = yPoint - 1;
-                }
-
-                if (step == "E")
-                {
-                    xPoint = xPoint + 1;
-                }
-
-                if (step == "W")
-                {
-                    xPoint = xPoint - 1;
-                }
-
-                if (!uniqueStepsTaken.ContainsKey($"x{xPoint}_y{yPoint}"))
-                {
-                    uniqueStepsTaken.Add($"x{xPoint}_y{yPoint}", step);
-                    stepCount = stepCount + 1;
-                }
-
-                rightCount = IsRightTurn(step, previuosStep) ? rightCount + 1 : rightCount;
-
-                previuosStep = step;
+                MoveUp(robotGridState, step);
+                MoveDown(robotGridState, step);
+                MoveLeft(robotGridState, step);
+                MoveRight(robotGridState, step);
             }
 
-            return stepCount;
+            return robotGridState;
         }
 
         private List<string> GetRobotSteps()
@@ -90,6 +55,64 @@ namespace ABSAProject.Console
             }
 
             return steps;
+        }
+        
+        private void MoveUp(RobotGridState robotGridState, string step)
+        {
+            if (IsStartingPoint(robotGridState) || step != "N")
+            {
+                return;
+            }
+
+            robotGridState.YPoint = robotGridState.YPoint + 1;
+            Move(robotGridState, step);
+        }
+
+        private void MoveDown(RobotGridState robotGridState, string step)
+        {
+            if (IsStartingPoint(robotGridState) || step != "S")
+            {
+                return;
+            }
+
+            robotGridState.YPoint = robotGridState.YPoint - 1;
+            Move(robotGridState, step);
+        }
+
+        private void MoveLeft(RobotGridState robotGridState, string step)
+        {
+            if (IsStartingPoint(robotGridState) || step != "W")
+            {
+                return;
+            }
+
+            robotGridState.XPoint = robotGridState.XPoint - 1;
+            Move(robotGridState, step);
+        }
+
+        private void MoveRight(RobotGridState robotGridState, string step)
+        {
+            if (IsStartingPoint(robotGridState) || step != "E")
+            {
+                return;
+            }
+
+            robotGridState.XPoint = robotGridState.XPoint + 1;
+            Move(robotGridState, step);
+        }
+
+        private void Move(RobotGridState robotGridState, string step)
+        {
+            robotGridState.RightTurnCount = IsRightTurn(step, robotGridState.PreviuosStep) ? robotGridState.RightTurnCount + 1 : robotGridState.RightTurnCount;
+
+            if (robotGridState.UniqueStepsTaken.ContainsKey($"x{robotGridState.XPoint}_y{robotGridState.YPoint}"))
+            {
+                return;
+            }
+
+            robotGridState.UniqueStepsTaken.Add($"x{robotGridState.XPoint}_y{robotGridState.YPoint}", step);
+            robotGridState.StepCount = robotGridState.StepCount + 1;
+            robotGridState.PreviuosStep = step;
         }
 
         private void CheckInstruction(string instruction)
@@ -121,5 +144,9 @@ namespace ABSAProject.Console
                    (previuosStep == "W" && currentStep == "N");
         }
 
+        private bool IsStartingPoint(RobotGridState robotGridState)
+        {
+            return robotGridState.StepCount == 0 && robotGridState.XPoint == X_ORIGIN && robotGridState.YPoint == Y_ORIGIN;
+        }
     }
 }
